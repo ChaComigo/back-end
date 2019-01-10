@@ -4,6 +4,12 @@
 const Model = use('Model')
 
 class Avaliacao extends Model {
+
+  avaliacaoResposta(){
+    return this.hasMany('App/Models/AvaliacaoResposta')
+  }
+
+
 }
 
 module.exports = Avaliacao
