@@ -1,26 +1,30 @@
-'use strict'
+"use strict";
 
-const Model = use('Model')
-const Hash = use('Hash')
+const Model = use("Model");
+const Hash = use("Hash");
 
 class Pessoa extends Model {
-  static boot () {
-    super.boot()
+  static boot() {
+    super.boot();
 
-    this.addHook('beforeSave', async (userInstance) => {
+    this.addHook("beforeSave", async userInstance => {
       if (userInstance.dirty.password) {
-        userInstance.password = await Hash.make(userInstance.password)
+        userInstance.password = await Hash.make(userInstance.password);
       }
-    })
+    });
   }
 
-  tokens () {
-    return this.hasMany('App/Models/Token')
+  tokens() {
+    return this.hasMany("App/Models/Token");
   }
 
-  endereco (){
-    return this.belongsTo('App/Models/Endereco')
+  endereco() {
+    return this.belongsTo("App/Models/Endereco");
+  }
+
+  avaliacao() {
+    return this.hasMany("App/Models/Avaliacao");
   }
 }
 
-module.exports = Pessoa
+module.exports = Pessoa;
