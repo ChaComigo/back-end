@@ -11,6 +11,13 @@ class AvaliacaoResposta extends Model {
   fator() {
     return this.belongsTo("App/Models/Fator");
   }
+  static get createdAtColumn() {
+    return null;
+  }
+
+  static get updatedAtColumn() {
+    return null;
+  }
 }
 
 module.exports = AvaliacaoResposta;

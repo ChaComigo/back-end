@@ -17,7 +17,7 @@ class PessoaController {
 
     const pessoa = await Pessoa.create(requestBody);
     const data_endereco = request.only(["cep", "cidade", "estado"]);
-    data_endereco["fk_pessoa_id"] = pessoa.id;
+    data_endereco["pessoa_id"] = pessoa.id;
     const endereco = Endereco.create(data_endereco);
 
     return pessoa;

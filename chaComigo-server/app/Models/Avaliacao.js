@@ -11,6 +11,13 @@ class Avaliacao extends Model {
   pessoa() {
     return this.belongsTo("App/Models/Pessoa");
   }
+  static get createdAtColumn() {
+    return null;
+  }
+
+  static get updatedAtColumn() {
+    return null;
+  }
 }
 
 module.exports = Avaliacao;
