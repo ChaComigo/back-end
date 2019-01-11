@@ -5,7 +5,14 @@ const Model = use("Model");
 
 class Endereco extends Model {
   pessoa() {
-    return this.hasMany("App/Models/Pessoa");
+    return this.belongsTo("App/Models/Pessoa");
+  }
+  static get createdAtColumn() {
+    return null;
+  }
+
+  static get updatedAtColumn() {
+    return null;
   }
 }
 
