@@ -4,7 +4,7 @@
 const Model = use("Model");
 
 class Endereco extends Model {
-  pessoa() {
+  pessoas() {
     return this.belongsTo("App/Models/Pessoa");
   }
   static get createdAtColumn() {

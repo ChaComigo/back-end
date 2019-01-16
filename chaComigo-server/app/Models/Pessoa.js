@@ -18,11 +18,11 @@ class Pessoa extends Model {
     return this.hasMany("App/Models/Token");
   }
 
-  endereco() {
+  enderecos() {
     return this.hasMany("App/Models/Endereco");
   }
 
-  avaliacao() {
+  avaliacoes() {
     return this.hasMany("App/Models/Avaliacao");
   }
   static get createdAtColumn() {
@@ -31,6 +31,10 @@ class Pessoa extends Model {
 
   static get updatedAtColumn() {
     return null;
+  }
+
+  static get hidden() {
+    return ["senha"];
   }
 }
 
