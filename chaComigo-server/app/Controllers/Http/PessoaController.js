@@ -5,33 +5,39 @@ const Endereco = use("App/Models/Endereco");
 const Database = use("Database");
 
 class PessoaController {
-  async index() {
-    return Pessoa.query()
+  async index({ response }) {
+    const pessoa = await Pessoa.query()
       .with("enderecos")
       .fetch();
+
+    response.status(200).json({
+      message: "Solicitação ok",
+      code: 0,
+      data: pessoa
+    });
   }
 
   async store({ request, response }) {
-    const data_pessoa = request.only([
-      "email",
-      "nome",
-      "senha",
-      "data_nascimento",
-      "genero"
-    ]);
-    const data_endereco = request.only(["cep", "cidade", "estado"]);
+    const data_pessoa = this.parseBody(request);
+    const data_endereco = request.only(["enderecos"]).enderecos[0];
 
     const trx = await Database.beginTransaction();
 
     try {
       const pessoa = await Pessoa.create(data_pessoa, trx);
-      const endereco = await Endereco.create(
-        { ...data_endereco, pessoa_id: pessoa.id },
-        trx
-      );
+      await Endereco.create({ ...data_endereco, pessoa_id: pessoa.id }, trx);
       await trx.commit();
 
-      return pessoa;
+      const data = await Pessoa.query()
+        .where({ id: pessoa.id })
+        .with("enderecos")
+        .first();
+
+      response.status(201).json({
+        message: "Solicitação ok",
+        code: 0,
+        data: data
+      });
     } catch (error) {
       await trx.rollback();
       return error;
@@ -39,7 +45,7 @@ class PessoaController {
   }
 
   async show({ params }) {
-    return Pessoa.query()
+    return await Pessoa.query()
       .where({ id: params.id })
       .with("enderecos")
       .first();
@@ -48,13 +54,7 @@ class PessoaController {
   async update({ params, request }) {
     const pessoa = await Pessoa.findOrFail(params.id);
 
-    const data_pessoa = request.only([
-      "email",
-      "nome",
-      "senha",
-      "data_nascimento",
-      "genero"
-    ]);
+    const data_pessoa = this.parseBody(request);
 
     const endereco = (await Endereco.query()
       .where("pessoa_id", pessoa.id)
@@ -77,8 +77,6 @@ class PessoaController {
       return error;
     }
   }
-
-  async destroy({ params, request, response }) {}
 
   parseBody(req) {
     return {

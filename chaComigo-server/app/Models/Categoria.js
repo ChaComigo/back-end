@@ -4,7 +4,7 @@
 const Model = use("Model");
 
 class Categoria extends Model {
-  fator() {
+  fatores() {
     return this.hasMany("App/Models/Fator");
   }
   static get createdAtColumn() {

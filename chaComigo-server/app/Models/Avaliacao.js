@@ -4,7 +4,7 @@
 const Model = use("Model");
 
 class Avaliacao extends Model {
-  avaliacaoResposta() {
+  avaliacaoRespostas() {
     return this.hasMany("App/Models/AvaliacaoResposta");
   }
 

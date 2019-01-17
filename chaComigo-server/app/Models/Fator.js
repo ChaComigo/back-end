@@ -4,11 +4,14 @@
 const Model = use("Model");
 
 class Fator extends Model {
+  static get table() {
+    return "fatores";
+  }
   categoria() {
     return this.belongsTo("App/Models/Categoria");
   }
 
-  avaliacaoResposta() {
+  avaliacaoRespostas() {
     return this.hasMany("App/Models/AvaliacaoResposta");
   }
   static get createdAtColumn() {
