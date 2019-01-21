@@ -14,13 +14,6 @@ class Fator extends Model {
   avaliacaoRespostas() {
     return this.hasMany("App/Models/AvaliacaoResposta");
   }
-  static get createdAtColumn() {
-    return null;
-  }
-
-  static get updatedAtColumn() {
-    return null;
-  }
 }
 
 module.exports = Fator;

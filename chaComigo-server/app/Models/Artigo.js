@@ -3,14 +3,6 @@
 /** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use("Model");
 
-class Artigo extends Model {
-  static get createdAtColumn() {
-    return null;
-  }
-
-  static get updatedAtColumn() {
-    return null;
-  }
-}
+class Artigo extends Model {}
 
 module.exports = Artigo;

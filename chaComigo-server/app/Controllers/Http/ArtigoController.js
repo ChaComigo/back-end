@@ -1,93 +1,70 @@
-'use strict'
+"use strict";
 
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
+const Artigo = use("App/Models/Artigo");
 
-/**
- * Resourceful controller for interacting with artigos
- */
 class ArtigoController {
-  /**
-   * Show a list of all artigos.
-   * GET artigos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+  async index() {
+    const artigo = await Artigo.all();
+
+    return { message: "Listando todos os artigos!", data: artigo };
   }
 
-  /**
-   * Render a form to be used for creating a new artigo.
-   * GET artigos/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+  async store({ request }) {
+    const data_artigo = this.parseBody(request);
+    const artigo = await Artigo.create(data_artigo);
+
+    return { message: "Artigo criado com sucesso!", data: artigo };
   }
 
-  /**
-   * Create/save a new artigo.
-   * POST artigos
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store ({ request, response }) {
+  async show({ params, response }) {
+    const artigo = await Artigo.find(params.id);
+
+    if (artigo) {
+      return { message: "Artigo encontrado!", data: artigo };
+    } else {
+      response.status(404).json({
+        message: "Artigo não encontrado!",
+        data: null
+      });
+    }
   }
 
-  /**
-   * Display a single artigo.
-   * GET artigos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
+  async update({ params, request, response }) {
+    const data_artigo = this.parseBody(request);
+    const artigo = await Artigo.find(params.id);
+
+    if (artigo) {
+      artigo.merge(data_artigo);
+      await artigo.save();
+      return { message: "Artigo atualizado!", data: artigo };
+    } else {
+      response.status(404).json({
+        message: "Artigo não encontrado!",
+        data: null
+      });
+    }
   }
 
-  /**
-   * Render a form to update an existing artigo.
-   * GET artigos/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
+  async destroy({ params, response }) {
+    const artigo = await Artigo.find(params.id);
+
+    if (artigo) {
+      await artigo.delete();
+      return { message: "Artigo deletado!", data: null };
+    } else {
+      response.status(404).json({
+        message: "Artigo não encontrado!",
+        data: null
+      });
+    }
   }
 
-  /**
-   * Update artigo details.
-   * PUT or PATCH artigos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
-  }
-
-  /**
-   * Delete a artigo with id.
-   * DELETE artigos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+  parseBody(req) {
+    return {
+      ...req.only(["texto", "titulo", "sinopse", "path_imagem"]),
+      ...req.params
+    };
   }
 }
 
-module.exports = ArtigoController
+module.exports = ArtigoController;

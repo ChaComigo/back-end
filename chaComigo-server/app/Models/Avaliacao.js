@@ -4,19 +4,15 @@
 const Model = use("Model");
 
 class Avaliacao extends Model {
+  static get table() {
+    return "avaliacoes";
+  }
   avaliacaoRespostas() {
     return this.hasMany("App/Models/AvaliacaoResposta");
   }
 
   pessoa() {
     return this.belongsTo("App/Models/Pessoa");
-  }
-  static get createdAtColumn() {
-    return null;
-  }
-
-  static get updatedAtColumn() {
-    return null;
   }
 }
 

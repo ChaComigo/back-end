@@ -2,53 +2,56 @@
 
 const Pessoa = use("App/Models/Pessoa");
 const Endereco = use("App/Models/Endereco");
-const Database = use("Database");
 
 class PessoaController {
-  async index({ response }) {
+  async index() {
     const pessoa = await Pessoa.query()
       .with("enderecos")
       .fetch();
 
-    response.status(200).json({
-      message: "Solicitação ok",
-      code: 0,
-      data: pessoa
-    });
+    return { message: "Todos os usuários", data: pessoa };
   }
 
   async store({ request, response }) {
     const data_pessoa = this.parseBody(request);
     const data_endereco = request.only(["enderecos"]).enderecos[0];
 
-    const trx = await Database.beginTransaction();
+    const pessoa_find = await Pessoa.query()
+      .where({ email: data_pessoa.email })
+      .first();
 
-    try {
-      const pessoa = await Pessoa.create(data_pessoa, trx);
-      await Endereco.create({ ...data_endereco, pessoa_id: pessoa.id }, trx);
-      await trx.commit();
+    if (pessoa_find) {
+      response.status(400).json({
+        message: "E-mail já cadastrado!",
+        data: null
+      });
+    } else {
+      const pessoa = await Pessoa.create(data_pessoa);
+      await Endereco.create({ ...data_endereco, pessoa_id: pessoa.id });
 
       const data = await Pessoa.query()
         .where({ id: pessoa.id })
         .with("enderecos")
         .first();
 
-      response.status(201).json({
-        message: "Solicitação ok",
-        code: 0,
-        data: data
-      });
-    } catch (error) {
-      await trx.rollback();
-      return error;
+      return { message: "Usuário criado com sucesso!", data: data };
     }
   }
 
-  async show({ params }) {
-    return await Pessoa.query()
+  async show({ params, response }) {
+    const pessoa = await Pessoa.query()
       .where({ id: params.id })
       .with("enderecos")
       .first();
+
+    if (pessoa) {
+      return { message: "Usuário encontrado!", data: pessoa };
+    } else {
+      return response.status(404).json({
+        message: "Usuário não encontrado!",
+        data: null
+      });
+    }
   }
 
   async update({ params, request }) {
@@ -61,21 +64,17 @@ class PessoaController {
       .fetch()).rows[0];
 
     const data_endereco = request.only(["cep", "cidade", "estado"]);
+    pessoa.merge(data_pessoa);
+    await pessoa.save();
+    endereco.merge(data_endereco);
+    await endereco.save();
 
-    const trx = await Database.beginTransaction();
+    const data = await Pessoa.query()
+      .where({ id: pessoa.id })
+      .with("enderecos")
+      .first();
 
-    try {
-      pessoa.merge(data_pessoa);
-      await pessoa.save(trx);
-      endereco.merge(data_endereco);
-      await endereco.save(trx);
-      await trx.commit();
-
-      return pessoa;
-    } catch (error) {
-      await trx.rollback();
-      return error;
-    }
+    return { message: "Usuário atualizado!", data: data };
   }
 
   parseBody(req) {

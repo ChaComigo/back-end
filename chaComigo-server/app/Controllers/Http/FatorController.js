@@ -1,19 +1,71 @@
 "use strict";
 
 const Fator = use("App/Models/Fator");
+const Categoria = use("App/Models/Categoria");
 
 class FatorController {
-  async index({ request, response, view }) {
-    return Fator.all();
+  async index() {
+    const fator = await Fator.all();
+
+    return { message: "Listando todos os fatores!", data: fator };
   }
 
-  async store({ request, response }) {}
+  async store({ params, request, response }) {
+    const data_fator = this.parseBody(request);
+    const categoria = await Categoria.find(params.id);
 
-  async show({ params, request, response, view }) {}
+    if (categoria) {
+      const fator = await Fator.create({
+        ...data_fator,
+        categoria_id: categoria.id
+      });
 
-  async update({ params, request, response }) {}
+      return { message: "Fator criado com sucesso!", data: fator };
+    } else {
+      response.status(404).json({
+        message: "Categoria selecionada não encontrada!",
+        data: null
+      });
+    }
+  }
 
-  async destroy({ params, request, response }) {}
+  async update({ params, request, response }) {
+    const fator = await Fator.find(params.id);
+    const data_fator = this.parseBody(request);
+
+    if (fator) {
+      fator.merge(data_fator);
+      fator.save();
+      return { message: "Fator atualizado com sucesso!", data: fator };
+    } else {
+      response.status(404).json({
+        message: "Fator não encontrado!",
+        data: null
+      });
+    }
+  }
+
+  async destroy({ params, response }) {
+    const fator = await Fator.find(params.id);
+
+    if (fator) {
+      await fator.delete();
+
+      return { message: "Fator deletado com sucesso!", data: null };
+    } else {
+      response.status(404).json({
+        message: "Fator não encontrado!",
+        data: null
+      });
+    }
+  }
+
+  parseBody(req) {
+    return {
+      ...req.only(["path_imagem", "descricao", "influencia", "peso", "info"]),
+      ...req.params
+    };
+  }
 }
 
 module.exports = FatorController;

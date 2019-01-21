@@ -25,13 +25,7 @@ class Pessoa extends Model {
   avaliacoes() {
     return this.hasMany("App/Models/Avaliacao");
   }
-  static get createdAtColumn() {
-    return null;
-  }
 
-  static get updatedAtColumn() {
-    return null;
-  }
 
   static get hidden() {
     return ["senha"];
